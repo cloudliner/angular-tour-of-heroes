@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
 import { Observable, of } from 'rxjs';
 import { MessageService } from './message.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json'})
+};
 
 @Injectable({
   providedIn: 'root'
@@ -55,5 +58,14 @@ export class HeroService {
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
+  }
+
+  /** PUT: update the hero on the server */
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.heroesUrl, hero, httpOptions)
+      .pipe(
+        tap(_ => this.log(`update hero id=${hero.id}`)),
+        catchError(this.handleError<any>('updateHero'))
+      );
   }
 }
